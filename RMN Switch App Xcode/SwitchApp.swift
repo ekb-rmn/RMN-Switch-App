@@ -4,6 +4,68 @@ import Carbon
 import ApplicationServices
 import ServiceManagement
 
+
+/// Interface language is independent of the keyboard layout being converted.
+enum L10n {
+    static let choices = ["system", "ru", "en"]
+    static func language(preference: String, preferredLanguages: [String]) -> String {
+        if preference == "ru" || preference == "en" { return preference }
+        return preferredLanguages.first?.lowercased().split(separator: "-").first == "ru" ? "ru" : "en"
+    }
+    static var current: String {
+        language(preference: UserDefaults.standard.string(forKey: "interfaceLanguage") ?? "system",
+                 preferredLanguages: Locale.preferredLanguages)
+    }
+    static let english: [String: String] = [
+        "Сменить раскладку": "Convert keyboard layout",
+        "Сменить регистр": "Change letter case",
+        "Настройки Switch…": "Switch Settings…",
+        "Завершить Switch": "Quit Switch",
+        "Запускать Switch при входе в систему?": "Launch Switch at login?",
+        "Switch будет готов к замене раскладки сразу после входа в macOS. Выбор можно изменить в настройках приложения.": "Switch will be ready to convert text when you log in to macOS. You can change this in the app settings.",
+        "Включить автозапуск": "Enable launch at login",
+        "Не сейчас": "Not Now",
+        "Не удалось изменить автозапуск": "Could not change launch at login",
+        "Открыть настройки macOS": "Open macOS Settings",
+        "Закрыть": "Close",
+        "Настройки…": "Settings…",
+        "Разрешить…": "Allow…",
+        "Разрешите доступ, чтобы Shift мог менять текст в других приложениях.": "Allow access so Shift can convert text in other apps.",
+        "Доступ разрешён. Если Shift не работает, перезапустите Switch.": "Access granted. If Shift does not work, restart Switch.",
+        "Доступ разрешён. Обработка клавиш работает.": "Access granted. Keyboard shortcuts are working.",
+        "Автозапуск включён.": "Launch at login is on.",
+        "Подтвердите автозапуск в настройках macOS.": "Approve launch at login in macOS Settings.",
+        "Автозапуск выключен.": "Launch at login is off.",
+        "Русская раскладка": "Russian keyboard layout",
+        "Английская раскладка": "English keyboard layout",
+        "RMN Switch App — разрешите Универсальный доступ": "RMN Switch App — allow Accessibility access",
+        "RMN Switch App — обработка клавиш недоступна; перезапустите приложение": "RMN Switch App — keyboard shortcuts unavailable; restart the app",
+        "Клавиши": "Shortcuts",
+        "Внешний вид": "Appearance",
+        "Система": "System",
+        "Раздел настроек": "Settings section",
+        "Клавиши замены": "Conversion shortcuts",
+        "Системные настройки": "System settings",
+        "Значок в меню": "Menu bar icon",
+        "Буквы": "Letters",
+        "Флаги": "Flags",
+        "Отображение раскладки в строке меню": "Keyboard layout indicator in the menu bar",
+        "Показывать название раскладки": "Show keyboard layout name",
+        "Универсальный доступ": "Accessibility",
+        "Запускать при входе в систему": "Launch at login",
+        "Подтвердить в macOS…": "Approve in macOS…",
+        "Раскладка": "Layout",
+        "Регистр": "Letter case",
+        "Нажмите на сочетание, затем задайте новое. Esc — отмена.": "Click a shortcut, then press new keys. Press Esc to cancel.",
+        "Установите Switch в папку «Программы» и повторите попытку. Автозапуск также можно настроить в macOS.": "Move Switch to Applications and try again. You can also manage login items in macOS Settings.",
+        "Язык приложения": "App language",
+        "Как в macOS": "System Default",
+    ]
+    static func text(_ russian: String, language: String = current) -> String {
+        language == "ru" ? russian : english[russian] ?? russian
+    }
+}
+
 enum LaunchAtLogin {
     enum State { case disabled, enabled, requiresApproval }
     static let label = "ru.rmn.LangSwitch.login"
@@ -541,15 +603,15 @@ final class SwitchApp: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWindow
         heading.addArrangedSubview(title); heading.addArrangedSubview(NSView()); heading.addArrangedSubview(control)
         fullWidth(heading, 26)
         divider()
-        for (title, shortcut) in [("Сменить раскладку", layoutShortcut), ("Сменить регистр", caseShortcut)] {
+        for (title, shortcut) in [(L10n.text("Сменить раскладку"), layoutShortcut), (L10n.text("Сменить регистр"), caseShortcut)] {
             let row = NSStackView(); row.spacing = 10
             row.addArrangedSubview(label(title)); row.addArrangedSubview(NSView())
             let key = label(shortcut.title, 13); key.textColor = .secondaryLabelColor; row.addArrangedSubview(key)
             fullWidth(row, 24)
         }
         divider()
-        _ = action("Настройки Switch…", #selector(showSettings))
-        _ = action("Завершить Switch", #selector(quit))
+        _ = action(L10n.text("Настройки Switch…"), #selector(showSettings))
+        _ = action(L10n.text("Завершить Switch"), #selector(quit))
         let size = NSSize(width: 312, height: stack.fittingSize.height + 16)
         glass.setFrameSize(size)
         let shadowInset: CGFloat = 40
@@ -660,10 +722,10 @@ final class SwitchApp: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWindow
             self.closePanel()
             NSApp.activate(ignoringOtherApps: true)
             let alert = NSAlert()
-            alert.messageText = "Запускать Switch при входе в систему?"
-            alert.informativeText = "Switch будет готов к замене раскладки сразу после входа в macOS. Выбор можно изменить в настройках приложения."
-            alert.addButton(withTitle: "Включить автозапуск")
-            alert.addButton(withTitle: "Не сейчас")
+            alert.messageText = L10n.text("Запускать Switch при входе в систему?")
+            alert.informativeText = L10n.text("Switch будет готов к замене раскладки сразу после входа в macOS. Выбор можно изменить в настройках приложения.")
+            alert.addButton(withTitle: L10n.text("Включить автозапуск"))
+            alert.addButton(withTitle: L10n.text("Не сейчас"))
             let response = alert.runModal()
             UserDefaults.standard.set(true, forKey: "loginPromptAnswered")
             self.loginPromptVisible = false
@@ -677,10 +739,10 @@ final class SwitchApp: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWindow
             if enabled && LaunchAtLogin.state == .requiresApproval { LaunchAtLogin.openSettings() }
         } catch {
             let alert = NSAlert()
-            alert.messageText = "Не удалось изменить автозапуск"
-            alert.informativeText = "\(error.localizedDescription)\nУстановите Switch в папку «Программы» и повторите попытку. Автозапуск также можно настроить в macOS."
-            alert.addButton(withTitle: "Открыть настройки macOS")
-            alert.addButton(withTitle: "Закрыть")
+            alert.messageText = L10n.text("Не удалось изменить автозапуск")
+            alert.informativeText = error.localizedDescription + "\n" + L10n.text("Установите Switch в папку «Программы» и повторите попытку. Автозапуск также можно настроить в macOS.")
+            alert.addButton(withTitle: L10n.text("Открыть настройки macOS"))
+            alert.addButton(withTitle: L10n.text("Закрыть"))
             NSApp.activate(ignoringOtherApps: true)
             if alert.runModal() == .alertFirstButtonReturn { LaunchAtLogin.openSettings() }
         }
@@ -696,11 +758,11 @@ final class SwitchApp: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWindow
 
     private func refreshSetupControls() {
         let trusted = AXIsProcessTrusted()
-        permissionSettingsButton?.title = trusted ? "Настройки…" : "Разрешить…"
-        permissionStatus?.stringValue = !trusted ? "Разрешите доступ, чтобы Shift мог менять текст в других приложениях." : tap == nil ? "Доступ разрешён. Если Shift не работает, перезапустите Switch." : "Доступ разрешён. Обработка клавиш работает."
+        permissionSettingsButton?.title = trusted ? L10n.text("Настройки…") : L10n.text("Разрешить…")
+        permissionStatus?.stringValue = !trusted ? L10n.text("Разрешите доступ, чтобы Shift мог менять текст в других приложениях.") : tap == nil ? L10n.text("Доступ разрешён. Если Shift не работает, перезапустите Switch.") : L10n.text("Доступ разрешён. Обработка клавиш работает.")
         let state = LaunchAtLogin.state
         loginCheckbox?.state = state == .disabled ? .off : .on
-        loginStatus?.stringValue = state == .enabled ? "Автозапуск включён." : state == .requiresApproval ? "Подтвердите автозапуск в настройках macOS." : "Автозапуск выключен."
+        loginStatus?.stringValue = state == .enabled ? L10n.text("Автозапуск включён.") : state == .requiresApproval ? L10n.text("Подтвердите автозапуск в настройках macOS.") : L10n.text("Автозапуск выключен.")
         loginApprovalButton?.isHidden = state != .requiresApproval
         fitSettingsWindow()
     }
@@ -764,7 +826,7 @@ final class SwitchApp: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWindow
             statusItem.button?.title = " " + (Unmanaged<CFString>.fromOpaque(pointer).takeUnretainedValue() as String)
         } else { statusItem.button?.title = "" }
         statusItem.button?.attributedTitle = NSAttributedString(string: statusItem.button?.title ?? "", attributes: [.font: NSFont.menuBarFont(ofSize: 11), .foregroundColor: NSColor.labelColor])
-        statusItem.button?.setAccessibilityLabel(language == "RU" ? "Русская раскладка" : english ? "Английская раскладка" : language)
+        statusItem.button?.setAccessibilityLabel(language == "RU" ? L10n.text("Русская раскладка") : english ? L10n.text("Английская раскладка") : language)
         if !busy { clearWord() }
     }
 
@@ -782,7 +844,7 @@ final class SwitchApp: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWindow
         }
         refreshSetupControls()
         statusItem.button?.appearsDisabled = !enabled
-        statusItem.button?.toolTip = !trusted ? "RMN Switch App — разрешите Универсальный доступ" : tap == nil ? "RMN Switch App — обработка клавиш недоступна; перезапустите приложение" : "RMN Switch App"
+        statusItem.button?.toolTip = !trusted ? L10n.text("RMN Switch App — разрешите Универсальный доступ") : tap == nil ? L10n.text("RMN Switch App — обработка клавиш недоступна; перезапустите приложение") : "RMN Switch App"
         let label = KeyboardSources.currentLabel()
         if displayedLanguage != label { updateInputSource() }
     }
@@ -1082,7 +1144,7 @@ final class SwitchApp: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWindow
             tabPicker.controlSize = .large
             tabPicker.target = self
             tabPicker.action = #selector(changeSettingsTab(_:))
-            for (index, item) in [("keyboard", "Клавиши"), ("paintbrush", "Внешний вид"), ("gearshape", "Система")].enumerated() {
+            for (index, item) in [("keyboard", L10n.text("Клавиши")), ("paintbrush", L10n.text("Внешний вид")), ("gearshape", L10n.text("Система"))].enumerated() {
                 let image = NSImage(systemSymbolName: item.0, accessibilityDescription: item.1)?
                     .withSymbolConfiguration(NSImage.SymbolConfiguration(pointSize: 22, weight: .regular))
                 tabPicker.setImage(image, forSegment: index)
@@ -1090,7 +1152,7 @@ final class SwitchApp: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWindow
                 tabPicker.setWidth(60, forSegment: index)
                 tabPicker.setToolTip(item.1, forSegment: index)
             }
-            tabPicker.setAccessibilityLabel("Раздел настроек")
+            tabPicker.setAccessibilityLabel(L10n.text("Раздел настроек"))
             let tabRow = NSView()
             tabRow.translatesAutoresizingMaskIntoConstraints = false
             tabPicker.translatesAutoresizingMaskIntoConstraints = false
@@ -1162,32 +1224,45 @@ final class SwitchApp: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWindow
                 settings.addArrangedSubview(heading)
                 return settings
             }
-            let keyboard = page("Клавиши замены")
-            let appearance = page("Внешний вид")
-            let system = page("Системные настройки")
+            let keyboard = page(L10n.text("Клавиши замены"))
+            let appearance = page(L10n.text("Внешний вид"))
+            let system = page(L10n.text("Системные настройки"))
             let appearanceRow = NSStackView()
             appearanceRow.spacing = 8
-            let appearanceLabel = NSTextField(labelWithString: "Значок в меню")
+            let appearanceLabel = NSTextField(labelWithString: L10n.text("Значок в меню"))
             let appearancePicker = NSPopUpButton(frame: .zero, pullsDown: false)
-            appearancePicker.addItems(withTitles: ["Буквы", "Флаги"])
+            appearancePicker.addItems(withTitles: [L10n.text("Буквы"), L10n.text("Флаги")])
             appearancePicker.selectItem(at: IndicatorStyle.allCases.firstIndex(of: indicatorStyle) ?? 0)
             appearancePicker.target = self
             appearancePicker.action = #selector(changeIndicatorStyle(_:))
-            appearancePicker.setAccessibilityLabel("Отображение раскладки в строке меню")
+            appearancePicker.setAccessibilityLabel(L10n.text("Отображение раскладки в строке меню"))
             appearancePicker.widthAnchor.constraint(equalToConstant: 120).isActive = true
             appearanceRow.addArrangedSubview(appearanceLabel)
             appearanceRow.addArrangedSubview(NSView())
             appearanceRow.addArrangedSubview(appearancePicker)
             appearance.addArrangedSubview(appearanceRow)
             appearanceRow.widthAnchor.constraint(equalTo: appearance.widthAnchor).isActive = true
-            let sourceNameCheckbox = NSButton(checkboxWithTitle: "Показывать название раскладки", target: self, action: #selector(toggleSourceName(_:)))
+            let sourceNameCheckbox = NSButton(checkboxWithTitle: L10n.text("Показывать название раскладки"), target: self, action: #selector(toggleSourceName(_:)))
             sourceNameCheckbox.state = showSourceName ? .on : .off
             appearance.addArrangedSubview(sourceNameCheckbox)
+            let languageRow = NSStackView()
+            languageRow.spacing = 8
+            languageRow.addArrangedSubview(NSTextField(labelWithString: L10n.text("Язык приложения")))
+            languageRow.addArrangedSubview(NSView())
+            let languagePicker = NSPopUpButton(frame: .zero, pullsDown: false)
+            languagePicker.addItems(withTitles: [L10n.text("Как в macOS"), "Русский", "English"])
+            languagePicker.selectItem(at: L10n.choices.firstIndex(of: UserDefaults.standard.string(forKey: "interfaceLanguage") ?? "system") ?? 0)
+            languagePicker.setAccessibilityLabel(L10n.text("Язык приложения"))
+            languagePicker.target = self
+            languagePicker.action = #selector(changeInterfaceLanguage(_:))
+            languageRow.addArrangedSubview(languagePicker)
+            appearance.addArrangedSubview(languageRow)
+            languageRow.widthAnchor.constraint(equalTo: appearance.widthAnchor).isActive = true
             let permissionRow = NSStackView()
             permissionRow.spacing = 8
-            permissionRow.addArrangedSubview(NSTextField(labelWithString: "Универсальный доступ"))
+            permissionRow.addArrangedSubview(NSTextField(labelWithString: L10n.text("Универсальный доступ")))
             permissionRow.addArrangedSubview(NSView())
-            let permissionAction = NSButton(title: "Разрешить…", target: self, action: #selector(openPermissions))
+            let permissionAction = NSButton(title: L10n.text("Разрешить…"), target: self, action: #selector(openPermissions))
             permissionAction.bezelStyle = .rounded
             permissionRow.addArrangedSubview(permissionAction)
             permissionSettingsButton = permissionAction
@@ -1199,7 +1274,7 @@ final class SwitchApp: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWindow
             system.addArrangedSubview(permissionNote)
             permissionNote.widthAnchor.constraint(equalTo: system.widthAnchor).isActive = true
             permissionStatus = permissionNote
-            let login = NSButton(checkboxWithTitle: "Запускать при входе в систему", target: self, action: #selector(changeLaunchAtLogin(_:)))
+            let login = NSButton(checkboxWithTitle: L10n.text("Запускать при входе в систему"), target: self, action: #selector(changeLaunchAtLogin(_:)))
             system.addArrangedSubview(login)
             loginCheckbox = login
             let loginNote = NSTextField(wrappingLabelWithString: "")
@@ -1208,11 +1283,11 @@ final class SwitchApp: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWindow
             system.addArrangedSubview(loginNote)
             loginNote.widthAnchor.constraint(equalTo: system.widthAnchor).isActive = true
             loginStatus = loginNote
-            let approval = NSButton(title: "Подтвердить в macOS…", target: self, action: #selector(openLoginSettings))
+            let approval = NSButton(title: L10n.text("Подтвердить в macOS…"), target: self, action: #selector(openLoginSettings))
             approval.bezelStyle = .rounded
             system.addArrangedSubview(approval)
             loginApprovalButton = approval
-            for (title, action, operation) in [("Раскладка", #selector(recordLayout), Operation.layout), ("Регистр", #selector(recordCase), Operation.letterCase)] {
+            for (title, action, operation) in [(L10n.text("Раскладка"), #selector(recordLayout), Operation.layout), (L10n.text("Регистр"), #selector(recordCase), Operation.letterCase)] {
                 let row = NSStackView(); row.spacing = 8
                 let icon = NSImageView(image: NSImage(systemSymbolName: operation == .layout ? "keyboard" : "textformat", accessibilityDescription: nil)!)
                 icon.contentTintColor = .secondaryLabelColor
@@ -1227,7 +1302,7 @@ final class SwitchApp: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWindow
                 keyboard.addArrangedSubview(row)
                 if operation == .layout { layoutButton = button } else { caseButton = button }
             }
-            let shortcutNote = NSTextField(wrappingLabelWithString: "Нажмите на сочетание, затем задайте новое. Esc — отмена.")
+            let shortcutNote = NSTextField(wrappingLabelWithString: L10n.text("Нажмите на сочетание, затем задайте новое. Esc — отмена."))
             shortcutNote.font = .systemFont(ofSize: 12)
             shortcutNote.textColor = .secondaryLabelColor
             keyboard.addArrangedSubview(shortcutNote)
@@ -1267,6 +1342,30 @@ final class SwitchApp: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWindow
         if abs(window.frame.height - frame.height) > 0.5 {
             window.setFrame(frame, display: true)
         }
+    }
+
+    @objc private func changeInterfaceLanguage(_ sender: NSPopUpButton) {
+        guard L10n.choices.indices.contains(sender.indexOfSelectedItem) else { return }
+        let selectedTab = settingsTabPicker?.selectedSegment ?? 1
+        let oldFrame = window?.frame
+        UserDefaults.standard.set(L10n.choices[sender.indexOfSelectedItem], forKey: "interfaceLanguage")
+        recording = nil
+        recordingTap = ModifierTap()
+        window?.delegate = nil
+        window?.close()
+        window = nil
+        settingsStack = nil
+        settingsPageHeight = nil
+        settingsTabs = nil
+        settingsTabPicker = nil
+        showSettings()
+        settingsTabPicker?.selectedSegment = selectedTab
+        settingsTabs?.selectTabViewItem(at: selectedTab)
+        if let oldFrame, let window {
+            window.setFrameOrigin(NSPoint(x: oldFrame.minX, y: oldFrame.maxY - window.frame.height))
+        }
+        updateInputSource()
+        fitSettingsWindow()
     }
 
     @objc private func changeIndicatorStyle(_ sender: NSPopUpButton) {
@@ -1338,6 +1437,15 @@ enum SwitchMain {
             let testDomain = "ru.rmn.LangSwitch.self-test." + UUID().uuidString
             let testDefaults = UserDefaults(suiteName: testDomain)!
             defer { testDefaults.removePersistentDomain(forName: testDomain) }
+            check(L10n.language(preference: "system", preferredLanguages: ["ru-RU", "en-US"]) == "ru", "Russian system language")
+            check(L10n.language(preference: "system", preferredLanguages: ["de-DE", "ru-RU"]) == "en", "unsupported language uses English")
+            check(L10n.language(preference: "ru", preferredLanguages: ["en-US"]) == "ru", "explicit Russian overrides system")
+            check(L10n.language(preference: "en", preferredLanguages: ["ru-RU"]) == "en", "explicit English overrides system")
+            check(L10n.language(preference: "invalid", preferredLanguages: []) == "en", "invalid preference fallback")
+            for (russian, english) in L10n.english {
+                check(!english.isEmpty && english.range(of: "[А-Яа-яЁё]", options: .regularExpression) == nil, "English translation: \(russian)")
+                check(L10n.text(russian, language: "ru") == russian && L10n.text(russian, language: "en") == english, "translation lookup")
+            }
             check(IndicatorStyle.load(from: testDefaults) == .letters, "default indicator uses letters")
             testDefaults.set(IndicatorStyle.flags.rawValue, forKey: "indicatorStyle")
             check(IndicatorStyle.load(from: UserDefaults(suiteName: testDomain)!) == .flags, "indicator preference reload")
@@ -1378,7 +1486,7 @@ enum SwitchMain {
             if let en = TextChange.nativeToRussian, let ru = TextChange.nativeToEnglish {
                 for (e, r) in en where e.isLetter { check(ru[r] == e, "native letter round trip") }
             }
-            print("PASS: text conversion, mixed layouts, indicator preferences, login configuration and shortcuts")
+            print("PASS: text conversion, mixed layouts, localization, indicator preferences, login configuration and shortcuts")
         } else {
             let app = NSApplication.shared
             let delegate = SwitchApp()
