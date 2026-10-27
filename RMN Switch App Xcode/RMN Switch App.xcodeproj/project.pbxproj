@@ -1,0 +1,28 @@
+// !$*UTF8*$!
+{
+ archiveVersion = 1;
+ classes = {};
+ objectVersion = 56;
+ objects = {
+  A00000000000000000000001 = {isa = PBXProject; attributes = {BuildIndependentTargetsInParallel = YES; LastUpgradeCheck = 2700;}; buildConfigurationList = A00000000000000000000002; compatibilityVersion = "Xcode 14.0"; developmentRegion = en; knownRegions = (en, Base); mainGroup = A00000000000000000000003; productRefGroup = A00000000000000000000004; projectDirPath = ""; projectRoot = ""; targets = (A00000000000000000000005);};
+  A00000000000000000000002 = {isa = XCConfigurationList; buildConfigurations = (A00000000000000000000010, A00000000000000000000011); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release;};
+  A00000000000000000000003 = {isa = PBXGroup; children = (A00000000000000000000006, A00000000000000000000007, A00000000000000000000008, A00000000000000000000004); sourceTree = "<group>";};
+  A00000000000000000000004 = {isa = PBXGroup; children = (A00000000000000000000009); name = Products; sourceTree = "<group>";};
+  A00000000000000000000005 = {isa = PBXNativeTarget; buildConfigurationList = A00000000000000000000012; buildPhases = (A00000000000000000000013, A00000000000000000000014, A00000000000000000000015); buildRules = (); dependencies = (); name = "RMN Switch App"; productName = "RMN Switch App"; productReference = A00000000000000000000009; productType = "com.apple.product-type.application";};
+  A00000000000000000000006 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwitchApp.swift; sourceTree = "<group>";};
+  A00000000000000000000007 = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>";};
+  A00000000000000000000008 = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>";};
+  A00000000000000000000009 = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "RMN Switch App.app"; sourceTree = BUILT_PRODUCTS_DIR;};
+  A00000000000000000000010 = {isa = XCBuildConfiguration; buildSettings = {ALWAYS_SEARCH_USER_PATHS = NO; SDKROOT = macosx; MACOSX_DEPLOYMENT_TARGET = 12.0; SWIFT_VERSION = 5.0; ARCHS = "arm64 x86_64"; ONLY_ACTIVE_ARCH = NO; SWIFT_OPTIMIZATION_LEVEL = "-Onone";}; name = Debug;};
+  A00000000000000000000011 = {isa = XCBuildConfiguration; buildSettings = {ALWAYS_SEARCH_USER_PATHS = NO; SDKROOT = macosx; MACOSX_DEPLOYMENT_TARGET = 12.0; SWIFT_VERSION = 5.0; ARCHS = "arm64 x86_64"; ONLY_ACTIVE_ARCH = NO; SWIFT_OPTIMIZATION_LEVEL = "-O";}; name = Release;};
+  A00000000000000000000012 = {isa = XCConfigurationList; buildConfigurations = (A00000000000000000000016, A00000000000000000000017); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release;};
+  A00000000000000000000013 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000018); runOnlyForDeploymentPostprocessing = 0;};
+  A00000000000000000000014 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0;};
+  A00000000000000000000015 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000019); runOnlyForDeploymentPostprocessing = 0;};
+  A00000000000000000000016 = {isa = XCBuildConfiguration; buildSettings = {PRODUCT_NAME = "RMN Switch App"; PRODUCT_BUNDLE_IDENTIFIER = ru.rmn.LangSwitch; INFOPLIST_FILE = Info.plist; GENERATE_INFOPLIST_FILE = NO; CODE_SIGN_STYLE = Manual; CODE_SIGN_IDENTITY = "-"; OTHER_CODE_SIGN_FLAGS = "--requirements '=designated => identifier \"ru.rmn.LangSwitch\"'"; ENABLE_HARDENED_RUNTIME = NO; COMBINE_HIDPI_IMAGES = YES;}; name = Debug;};
+  A00000000000000000000017 = {isa = XCBuildConfiguration; buildSettings = {PRODUCT_NAME = "RMN Switch App"; PRODUCT_BUNDLE_IDENTIFIER = ru.rmn.LangSwitch; INFOPLIST_FILE = Info.plist; GENERATE_INFOPLIST_FILE = NO; CODE_SIGN_STYLE = Manual; CODE_SIGN_IDENTITY = "-"; OTHER_CODE_SIGN_FLAGS = "--requirements '=designated => identifier \"ru.rmn.LangSwitch\"'"; ENABLE_HARDENED_RUNTIME = NO; COMBINE_HIDPI_IMAGES = YES;}; name = Release;};
+  A00000000000000000000018 = {isa = PBXBuildFile; fileRef = A00000000000000000000006;};
+  A00000000000000000000019 = {isa = PBXBuildFile; fileRef = A00000000000000000000007;};
+ };
+ rootObject = A00000000000000000000001;
+}
